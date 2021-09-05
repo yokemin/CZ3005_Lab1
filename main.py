@@ -159,7 +159,7 @@ class Graph:
                     if neighbour not in previous_nodes.keys() and (new_accumulated_cost <= 287932):
                         # Calculate heuristic function to use to determine priority in queue
                         gn = self.dists[edge]
-                        new_fn = current_fn + gn + self.get_heuristic_function(neighbour, target)
+                        new_fn = (current_fn - self.get_heuristic_function(current, target)) + gn + self.get_heuristic_function(neighbour, target)
                         queue.put((new_fn, (neighbour, current)))
 
         self.print_path(source, target, previous_nodes)
@@ -237,7 +237,7 @@ class Graph:
             # Calculate the new accumulated cost with the new neighbour node added
             edge = source + "," + neighbour
             new_accumulated_cost = self.costs[edge]
-            if neighbour not in previous_nodes.keys() and (new_accumulated_cost <= 287932):
+            if neighbour not in previous_nodes.keys() and (new_accumulated_cost <= 287932000):
                 edge_dist = self.dists[edge]
                 queue.put((edge_dist, (neighbour, source)))
 
@@ -267,7 +267,7 @@ class Graph:
                     accumulated_cost = previous_nodes_with_cost_accumulated[current][1]
                     edge = current + "," + neighbour
                     new_accumulated_cost = accumulated_cost + self.costs[edge]
-                    if neighbour not in previous_nodes.keys() and (new_accumulated_cost <= 287932):
+                    if neighbour not in previous_nodes.keys() and (new_accumulated_cost <= 287932000):
                         edge_dist = self.dists[edge]
                         total_dist = dist + edge_dist
                         queue.put((total_dist, (neighbour, current)))
@@ -298,6 +298,7 @@ class Graph:
             distance = 0
             energy_cost = 0
             removed_node = route.pop() # remove starting node
+            no_of_nodes = len(route)
             while len(route) != 0:
                 current_node = route.pop()
                 edge = removed_node + "," + current_node
@@ -307,6 +308,7 @@ class Graph:
                 path += "->" + current_node
                 removed_node = current_node
 
+            print("No of nodes in path: " + str(no_of_nodes) + ".")
             print("Shortest path: " + path + ".")
             print("Shortest distance: " + str(distance) + ".")
             print("Total energy cost: " + str(energy_cost) + ".")
