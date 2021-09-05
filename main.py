@@ -237,7 +237,7 @@ class Graph:
             # Calculate the new accumulated cost with the new neighbour node added
             edge = source + "," + neighbour
             new_accumulated_cost = self.costs[edge]
-            if neighbour not in previous_nodes.keys() and (new_accumulated_cost <= 287932000):
+            if neighbour not in previous_nodes.keys() and (new_accumulated_cost <= 287932):
                 edge_dist = self.dists[edge]
                 queue.put((edge_dist, (neighbour, source)))
 
@@ -267,7 +267,7 @@ class Graph:
                     accumulated_cost = previous_nodes_with_cost_accumulated[current][1]
                     edge = current + "," + neighbour
                     new_accumulated_cost = accumulated_cost + self.costs[edge]
-                    if neighbour not in previous_nodes.keys() and (new_accumulated_cost <= 287932000):
+                    if neighbour not in previous_nodes.keys() and (new_accumulated_cost <= 287932):
                         edge_dist = self.dists[edge]
                         total_dist = dist + edge_dist
                         queue.put((total_dist, (neighbour, current)))
@@ -337,6 +337,7 @@ while (task_no != "4"):
         target = input("Enter destination node: ")
         print("--- USING ASTAR: ")
         g.astar(source, target)
+
     elif task_no == "5":
         source = input("Enter starting node: ")
         target = input("Enter destination node: ")
