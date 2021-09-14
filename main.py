@@ -303,10 +303,10 @@ class Graph:
                 removed_node = current_node
 
             print("No of nodes in path: " + str(no_of_nodes) + ".")
+            print("Number of nodes expanded: " + str(len(previous_nodes)))
             print("Shortest path: " + path + ".")
             print("Shortest distance: " + str(distance) + ".")
             print("Total energy cost: " + str(energy_cost) + ".")
-            print("Number of nodes expanded: " + str(len(previous_nodes)))
 
 
 
