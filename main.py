@@ -1,7 +1,7 @@
 import json
 from queue import PriorityQueue
 from math import sqrt
-
+import time
 
 class Graph:
 
@@ -24,6 +24,9 @@ class Graph:
 
     # Task 1: Using UCS to solve relaxed version of the NYC instance
     def UCS(self, source, target):
+
+        # Start time
+        tic = time.perf_counter()
 
         # Create a priority queue for UCS
         queue = PriorityQueue()
@@ -63,10 +66,19 @@ class Graph:
                         total_dist = dist + edge_dist
                         queue.put((total_dist, (neighbour, current)))
 
+        # End time
+        toc = time.perf_counter()
+
+        # Print time taken
+        print(f"Completed search in: {toc - tic:0.4f} seconds")
+
         self.print_path(source, target, previous_nodes)
 
     # Task 2: Using UCS to solve the NYC instance, with the energy budget set to be 287932
     def modified_UCS(self, source, target):
+
+        # Start time
+        tic = time.perf_counter()
 
         # Create a priority queue for UCS
         queue = PriorityQueue()
@@ -119,6 +131,12 @@ class Graph:
                         total_dist = dist + edge_dist
                         queue.put((total_dist, (neighbour, current)))
 
+        # End time
+        toc = time.perf_counter()
+
+        # Print time taken
+        print(f"Completed search in: {toc - tic:0.4f} seconds")
+
         self.print_path(source, target, previous_nodes)
 
     # Task 3: A* search algorithm to solve the NYC instance
@@ -126,6 +144,9 @@ class Graph:
     # E.g. Source/Current Node X(x1,y1) and Target Node B(x2,y2). Then h(n) = sqrt((x2 – x1)^2 + (y2 – y1)^2).
     # f(n) = g(n) + h(n), where g(n) is UCS
     def astar(self, source, target):
+
+        # Start time
+        tic = time.perf_counter()
 
         # Create a priority queue for astar
         queue = PriorityQueue()
@@ -181,6 +202,12 @@ class Graph:
                         new_fn = (current_fn - self.get_heuristic_function(current, target)) + gn + self.get_heuristic_function(neighbour, target)
                         queue.put((new_fn, (neighbour, current)))
 
+        # End time
+        toc = time.perf_counter()
+
+        # Print time taken
+        print(f"Completed search in: {toc - tic:0.4f} seconds")
+
         self.print_path(source, target, previous_nodes)
     # maybe heuristic funct can weigh more on energy
 
@@ -234,6 +261,9 @@ class Graph:
     # Additional (Part of the approach to solving the shortest path problem)
     def BFS(self, source, target):
 
+        # Start time
+        tic = time.perf_counter()
+
         # Create a queue for BFS
         queue = []
 
@@ -259,10 +289,19 @@ class Graph:
                     queue.append(neighbour)
                     previous_nodes[neighbour] = current
 
+        # End time
+        toc = time.perf_counter()
+
+        # Print time taken
+        print(f"Completed search in: {toc - tic:0.4f} seconds")
+
         self.print_path(source, target, previous_nodes)
 
 
     def modified_BFS(self, source, target):
+
+        # Start time
+        tic = time.perf_counter()
 
         # Create a queue for BFS
         queue = []
@@ -296,6 +335,12 @@ class Graph:
                     queue.append(neighbour)
                     previous_nodes[neighbour] = current
                     previous_nodes_with_cost_accumulated[neighbour] = [current, new_accumulated_cost]
+
+        # End time
+        toc = time.perf_counter()
+
+        # Print time taken
+        print(f"Completed search in: {toc - tic:0.4f} seconds")
 
         self.print_path(source, target, previous_nodes)
 
