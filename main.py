@@ -21,11 +21,12 @@ class Graph:
     with open('Coord.json') as json_file:
         coords = json.load(json_file)
 
-    # Task 1: Using BFS to solve relaxed version of the NYC instance
-    def BFS(self, source, target):
 
-        # Create a queue for BFS
-        queue = []
+    # Task 1: Using UCS to solve relaxed version of the NYC instance
+    def UCS(self, source, target):
+
+        # Create a priority queue for UCS
+        queue = PriorityQueue()
 
         # Create a dict to store key:value = node:prev_node
         previous_nodes = {}
@@ -33,35 +34,44 @@ class Graph:
         # Put source into previous_nodes
         previous_nodes[source] = source
 
-        # Enqueue the source node
-        queue.append(source)
+        # Enqueue the source node's neighbours with their dist
+        for neighbour in self.graph[source]:
+            if neighbour not in previous_nodes.keys():
+                edge = source + "," + neighbour
+                edge_dist = self.dists[edge]
+                queue.put((edge_dist, (neighbour, source)))
 
-        # BFS
+        # UCS
         while queue:
 
-            # Dequeue a node from queue and print it
-            current = queue.pop(0)
+            # Choose a node with the smallest dist:
+            dist, (current, previous) = queue.get()
 
-            # Get all adjacent vertices of the de-queued node current. If a adjacent
-            # has not been visited, then enqueue it
-            for neighbour in self.graph[current]:
-                if neighbour not in previous_nodes.keys():
-                    queue.append(neighbour)
-                    previous_nodes[neighbour] = current
+            if current not in previous_nodes.keys():
+                # Add current node and its previous node into previous_nodes
+                previous_nodes[current] = previous
+
+                if current == target:
+                    break
+
+                # Get all adjacent vertices of the de-queued node current. If a adjacent
+                # has not been visited, add its (dist,(neighbour,current)) into queue
+                for neighbour in self.graph[current]:
+                    if neighbour not in previous_nodes.keys():
+                        edge = current + "," + neighbour
+                        edge_dist = self.dists[edge]
+                        total_dist = dist + edge_dist
+                        queue.put((total_dist, (neighbour, current)))
 
         self.print_path(source, target, previous_nodes)
 
+    # Task 2: Using UCS to solve the NYC instance, with the energy budget set to be 287932
+    def modified_UCS(self, source, target):
 
+        # Create a priority queue for UCS
+        queue = PriorityQueue()
 
-
-    # Task 2: Using BFS to solve the NYC instance, with the energy budget set to be 287932
-    # (test using 4-580)
-    def modified_BFS(self, source, target):
-
-        # Create a queue for BFS
-        queue = []
-
-        # Create a dict to store key:value = node:prev_node
+        # Create a dict to store key:value = node:prev_node and another to keep track of cost accumulated
         previous_nodes = {}
         previous_nodes_with_cost_accumulated = {}
 
@@ -69,32 +79,47 @@ class Graph:
         previous_nodes[source] = source
         previous_nodes_with_cost_accumulated[source] = [source, 0]
 
-        # Enqueue the source node
-        queue.append(source)
+        # Enqueue the source node's neighbours with their dist and cost
+        for neighbour in self.graph[source]:
+            # Calculate the new accumulated cost with the new neighbour node added
+            edge = source + "," + neighbour
+            new_accumulated_cost = self.costs[edge]
+            if neighbour not in previous_nodes.keys() and (new_accumulated_cost <= 287932):
+                edge_dist = self.dists[edge]
+                queue.put((edge_dist, (neighbour, source)))
 
-        # BFS, taking note of energy cost
+        # UCS, taking note of energy cost
         while queue:
 
-            # Dequeue a node from queue and print it
-            current = queue.pop(0)
+            # Choose a node with the smallest dist:
+            dist, (current, previous) = queue.get()
 
-            # Get all adjacent vertices of the de-queued node current. If a adjacent
-            # has not been visited AND cost accumulated with the neighbour node included is
-            # less than 287932, then enqueue it.
-            for neighbour in self.graph[current]:
-                accumulated_cost = previous_nodes_with_cost_accumulated[current][1]
-                # Calculate the new accumulated cost with the new neighbour node added
-                edge = current + "," + neighbour
+            if current not in previous_nodes.keys():
+                # Add current node and its previous node into previous_nodes
+                previous_nodes[current] = previous
+
+                # Add current node and its accumulated_cost into previous_nodes_with_cost_accumulated
+                accumulated_cost = previous_nodes_with_cost_accumulated[previous][1]
+                edge = previous + "," + current
                 new_accumulated_cost = accumulated_cost + self.costs[edge]
-                if (neighbour not in previous_nodes.keys()) and (new_accumulated_cost <= 287932):
-                    queue.append(neighbour)
-                    previous_nodes[neighbour] = current
-                    previous_nodes_with_cost_accumulated[neighbour] = [current, new_accumulated_cost]
+                previous_nodes_with_cost_accumulated[current] = [previous, new_accumulated_cost]
+
+                if current == target:
+                    break
+
+                # Get all adjacent vertices of the de-queued node. If a adjacent
+                # has not been visited AND accumulated_cost with neighbour node include does not exceed 287932,
+                # add its (dist,(neighbour,current)) into queue.
+                for neighbour in self.graph[current]:
+                    accumulated_cost = previous_nodes_with_cost_accumulated[current][1]
+                    edge = current + "," + neighbour
+                    new_accumulated_cost = accumulated_cost + self.costs[edge]
+                    if neighbour not in previous_nodes.keys() and (new_accumulated_cost <= 287932):
+                        edge_dist = self.dists[edge]
+                        total_dist = dist + edge_dist
+                        queue.put((total_dist, (neighbour, current)))
 
         self.print_path(source, target, previous_nodes)
-
-
-
 
     # Task 3: A* search algorithm to solve the NYC instance
     # Heuristic Function: Using Euclidean dist (Pythagoras) of current node to target node, since we are given the coords
@@ -168,108 +193,6 @@ class Graph:
         return hn
 
 
-    def UCS(self, source, target):
-
-        # Create a priority queue for UCS
-        queue = PriorityQueue()
-
-        # Create a dict to store key:value = node:prev_node
-        previous_nodes = {}
-
-        # Put source into previous_nodes
-        previous_nodes[source] = source
-
-        # Enqueue the source node's neighbours with their dist
-        for neighbour in self.graph[source]:
-            if neighbour not in previous_nodes.keys():
-                edge = source + "," + neighbour
-                edge_dist = self.dists[edge]
-                queue.put((edge_dist, (neighbour, source)))
-
-        # UCS
-        while queue:
-
-            # Choose a node with the smallest dist:
-            dist, (current, previous) = queue.get()
-
-            if current not in previous_nodes.keys():
-                # Add current node and its previous node into previous_nodes
-                previous_nodes[current] = previous
-
-                if current == target:
-                    break
-
-                # Get all adjacent vertices of the de-queued node current. If a adjacent
-                # has not been visited, add its (dist,(neighbour,current)) into queue
-                for neighbour in self.graph[current]:
-                    if neighbour not in previous_nodes.keys():
-                        edge = current + "," + neighbour
-                        edge_dist = self.dists[edge]
-                        total_dist = dist + edge_dist
-                        queue.put((total_dist, (neighbour, current)))
-
-        self.print_path(source, target, previous_nodes)
-
-
-
-
-    def modified_UCS(self, source, target):
-
-        # Create a priority queue for UCS
-        queue = PriorityQueue()
-
-        # Create a dict to store key:value = node:prev_node and another to keep track of cost accumulated
-        previous_nodes = {}
-        previous_nodes_with_cost_accumulated = {}
-
-        # Put source into previous_nodes
-        previous_nodes[source] = source
-        previous_nodes_with_cost_accumulated[source] = [source, 0]
-
-        # Enqueue the source node's neighbours with their dist and cost
-        for neighbour in self.graph[source]:
-            # Calculate the new accumulated cost with the new neighbour node added
-            edge = source + "," + neighbour
-            new_accumulated_cost = self.costs[edge]
-            if neighbour not in previous_nodes.keys() and (new_accumulated_cost <= 287932):
-                edge_dist = self.dists[edge]
-                queue.put((edge_dist, (neighbour, source)))
-
-        # UCS, taking note of energy cost
-        while queue:
-
-            # Choose a node with the smallest dist:
-            dist, (current, previous) = queue.get()
-
-            if current not in previous_nodes.keys():
-                # Add current node and its previous node into previous_nodes
-                previous_nodes[current] = previous
-
-                # Add current node and its accumulated_cost into previous_nodes_with_cost_accumulated
-                accumulated_cost = previous_nodes_with_cost_accumulated[previous][1]
-                edge = previous + "," + current
-                new_accumulated_cost = accumulated_cost + self.costs[edge]
-                previous_nodes_with_cost_accumulated[current] = [previous, new_accumulated_cost]
-
-                if current == target:
-                    break
-
-                # Get all adjacent vertices of the de-queued node. If a adjacent
-                # has not been visited AND accumulated_cost with neighbour node include does not exceed 287932,
-                # add its (dist,(neighbour,current)) into queue.
-                for neighbour in self.graph[current]:
-                    accumulated_cost = previous_nodes_with_cost_accumulated[current][1]
-                    edge = current + "," + neighbour
-                    new_accumulated_cost = accumulated_cost + self.costs[edge]
-                    if neighbour not in previous_nodes.keys() and (new_accumulated_cost <= 287932):
-                        edge_dist = self.dists[edge]
-                        total_dist = dist + edge_dist
-                        queue.put((total_dist, (neighbour, current)))
-
-        self.print_path(source, target, previous_nodes)
-
-
-
     # Function to print shortest path found
     def print_path(self, source, target, previous_nodes):
 
@@ -308,8 +231,73 @@ class Graph:
             print("Shortest distance: " + str(distance) + ".")
             print("Total energy cost: " + str(energy_cost) + ".")
 
+    # Additional (Part of the approach to solving the shortest path problem)
+    def BFS(self, source, target):
+
+        # Create a queue for BFS
+        queue = []
+
+        # Create a dict to store key:value = node:prev_node
+        previous_nodes = {}
+
+        # Put source into previous_nodes
+        previous_nodes[source] = source
+
+        # Enqueue the source node
+        queue.append(source)
+
+        # BFS
+        while queue:
+
+            # Dequeue a node from queue and print it
+            current = queue.pop(0)
+
+            # Get all adjacent vertices of the de-queued node current. If a adjacent
+            # has not been visited, then enqueue it
+            for neighbour in self.graph[current]:
+                if neighbour not in previous_nodes.keys():
+                    queue.append(neighbour)
+                    previous_nodes[neighbour] = current
+
+        self.print_path(source, target, previous_nodes)
 
 
+    def modified_BFS(self, source, target):
+
+        # Create a queue for BFS
+        queue = []
+
+        # Create a dict to store key:value = node:prev_node
+        previous_nodes = {}
+        previous_nodes_with_cost_accumulated = {}
+
+        # Put source into previous_nodes
+        previous_nodes[source] = source
+        previous_nodes_with_cost_accumulated[source] = [source, 0]
+
+        # Enqueue the source node
+        queue.append(source)
+
+        # BFS, taking note of energy cost
+        while queue:
+
+            # Dequeue a node from queue and print it
+            current = queue.pop(0)
+
+            # Get all adjacent vertices of the de-queued node current. If a adjacent
+            # has not been visited AND cost accumulated with the neighbour node included is
+            # less than 287932, then enqueue it.
+            for neighbour in self.graph[current]:
+                accumulated_cost = previous_nodes_with_cost_accumulated[current][1]
+                # Calculate the new accumulated cost with the new neighbour node added
+                edge = current + "," + neighbour
+                new_accumulated_cost = accumulated_cost + self.costs[edge]
+                if (neighbour not in previous_nodes.keys()) and (new_accumulated_cost <= 287932):
+                    queue.append(neighbour)
+                    previous_nodes[neighbour] = current
+                    previous_nodes_with_cost_accumulated[neighbour] = [current, new_accumulated_cost]
+
+        self.print_path(source, target, previous_nodes)
 
 # Driver code
 task_no = input("------------------ Options ------------------\n1: UCS\n" +
