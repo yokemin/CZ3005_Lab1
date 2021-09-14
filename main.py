@@ -2,13 +2,7 @@ import json
 from queue import PriorityQueue
 from math import sqrt
 
-# Python3 Program to print BFS traversal
-# from a given sou  rce vertex. BFS(int s)
-# traverses vertices reachable from s.
-from collections import defaultdict
 
-# This class represents a directed graph
-# using adjacency list representation
 class Graph:
 
     # Load G.json file
@@ -297,8 +291,8 @@ class Graph:
             path = str(source)
             distance = 0
             energy_cost = 0
+            no_of_nodes = len(route) + 1
             removed_node = route.pop() # remove starting node
-            no_of_nodes = len(route)
             while len(route) != 0:
                 current_node = route.pop()
                 edge = removed_node + "," + current_node
@@ -312,6 +306,7 @@ class Graph:
             print("Shortest path: " + path + ".")
             print("Shortest distance: " + str(distance) + ".")
             print("Total energy cost: " + str(energy_cost) + ".")
+            print("Number of nodes expanded: " + str(len(previous_nodes)))
 
 
 
