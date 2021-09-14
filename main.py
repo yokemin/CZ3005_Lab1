@@ -312,40 +312,52 @@ class Graph:
 
 
 # Driver code
-task_no = input("Enter task number (1, 2, or 3 or press 4 to quit): ")
+task_no = input("------------------ Options ------------------\n1: UCS\n" +
+                "2: UCS limited by energy cost\n" +
+                "3: ASTAR limited by energy cost\n" +
+                "(Additional) 4: BFS\n" +
+                "(Additional) 5: BFS limited by energy cost\n" +
+                "6: Quit\n" +
+                "Enter task number: ")
 
 g = Graph()
 
-while (task_no != "4"):
+while (task_no != "6"):
     if task_no == "1":
+        source = input("Enter starting node: ")
+        target = input("Enter destination node: ")
+        print("--- TASK 1 - USING UCS: ")
+        g.UCS(source, target)
+    elif task_no == "2":
+        source = input("Enter starting node: ")
+        target = input("Enter destination node: ")
+        print("--- TASK 2 - USING UCS LIMITED BY ENERGY COST: ")
+        g.modified_UCS(source, target)
+    elif task_no == "3":
+        source = input("Enter starting node: ")
+        target = input("Enter destination node: ")
+        print("--- TASK 3 - USING ASTAR: ")
+        g.astar(source, target)
+    elif task_no == "4":
         source = input("Enter starting node: ")
         target = input("Enter destination node: ")
         print("--- USING BFS: ")
         g.BFS(source, target)
-    elif task_no == "2":
+    elif task_no == "5":
         source = input("Enter starting node: ")
         target = input("Enter destination node: ")
         print("--- USING BFS LIMITED BY ENERGY COST: ")
         g.modified_BFS(source, target)
-    elif task_no == "3":
-        source = input("Enter starting node: ")
-        target = input("Enter destination node: ")
-        print("--- USING ASTAR: ")
-        g.astar(source, target)
-
-    elif task_no == "5":
-        source = input("Enter starting node: ")
-        target = input("Enter destination node: ")
-        print("--- USING UCS: ")
-        g.UCS(source, target)
-    elif task_no == "6":
-        source = input("Enter starting node: ")
-        target = input("Enter destination node: ")
-        print("--- USING UCS LIMITED BY ENERGY COST: ")
-        g.modified_UCS(source, target)
     else:
         print("Invalid task number!")
 
     print("---------------------------------------------------------------")
-    task_no = input("Enter task number (1, 2, or 3 or press 4 to quit): ")
+    task_no = input("------------------ Options ------------------\n1: UCS\n" +
+                    "2: UCS limited by energy cost\n" +
+                    "3: ASTAR limited by energy cost\n" +
+                    "(Additional) 4: BFS\n" +
+                    "(Additional) 5: BFS limited by energy cost\n" +
+                    "6: Quit\n" +
+                    "Enter task number: ")
+
 
