@@ -241,7 +241,7 @@ class Graph:
             path = str(source)
             distance = 0
             energy_cost = 0
-            no_of_nodes = len(route) + 1
+            no_of_nodes = len(route)
             removed_node = route.pop() # remove starting node
             while len(route) != 0:
                 current_node = route.pop()
